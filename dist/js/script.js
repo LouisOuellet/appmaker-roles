@@ -20,9 +20,9 @@ API.Plugins.roles = {
 				},function(result) {
 					var dataset = JSON.parse(result);
 					if(dataset.success != undefined){
-						for(const [key, value] of Object.entries(dataset.output.results)){ API.Helper.set(API.Contents,['data','dom','roles',value.name],value); }
+						for(const [key, value] of Object.entries(dataset.output.dom)){ API.Helper.set(API.Contents,['data','dom','roles',value.name],value); }
 						for(const [key, value] of Object.entries(dataset.output.raw)){ API.Helper.set(API.Contents,['data','raw','roles',value.name],value); }
-						API.Builder.table(card.children('.card-body'), dataset.output.results, {
+						API.Builder.table(card.children('.card-body'), dataset.output.dom, {
 							headers:dataset.output.headers,
 							id:'RolesIndex',
 							modal:true,
@@ -290,7 +290,7 @@ API.Plugins.roles = {
 														API.request('permissions','create',{data:values,report:false},function(result){
 															var permission = JSON.parse(result);
 															if(permission.success != undefined){
-																API.Plugins.roles.element.table.permissions.DataTable().row.add(permission.output.results).draw(false).node().id = permission.output.results.id;
+																API.Plugins.roles.element.table.permissions.DataTable().row.add(permission.output.dom).draw(false).node().id = permission.output.dom.id;
 																API.Plugins.roles.Event.Permissions();
 															}
 														});
@@ -376,7 +376,7 @@ API.Plugins.roles = {
 													API.request('relationships','create',{data:relationship},function(result){
 														var member = JSON.parse(result);
 														if(member.success != undefined){
-															API.Plugins.roles.element.table.members.DataTable().row.add({name:member.output.results.link_to_1,type:member.output.results.relationship_1,id:member.output.results.id}).draw(false).node().id = member.output.results.id;
+															API.Plugins.roles.element.table.members.DataTable().row.add({name:member.output.dom.link_to_1,type:member.output.dom.relationship_1,id:member.output.dom.id}).draw(false).node().id = member.output.dom.id;
 															API.Plugins.roles.Event.Members();
 														}
 													});
@@ -511,7 +511,7 @@ API.Plugins.roles = {
 									API.request('permissions','update',{data:values,report:true},function(result){
 										var dataset = JSON.parse(result);
 										if(dataset.success != undefined){
-											row.data(dataset.output.results).draw(false);
+											row.data(dataset.output.dom).draw(false);
 											API.Plugins.roles.Event.Permissions();
 										}
 									});
