@@ -1,28 +1,28 @@
-API.Plugins.members = {
+Engine.Plugins.members = {
 	forms:{
 		create:{0:"name",extra:{ 0:"table"}},
 		update:{0:"name",extra:{ 0:"table"}},
 	},
 	options:{create:{skip:['role_id']},update:{skip:['role_id']}},
 };
-API.Plugins.roles = {
+Engine.Plugins.roles = {
 	element:{
 		table:{index:{},permissions:{},members:{}},
 	},
 	init:function(){
-		API.GUI.Sidebar.Nav.add('Roles', 'administration');
+		Engine.GUI.Sidebar.Nav.add('Roles', 'administration');
 	},
 	load:{
 		index:function(){
-			API.Builder.card($('#pagecontent'),{ title: 'Roles', icon: 'roles'}, function(card){
-				API.request('roles','read',{
+			Engine.Builder.card($('#pagecontent'),{ title: 'Roles', icon: 'roles'}, function(card){
+				Engine.request('roles','read',{
 					data:{options:{ link_to:'RolesIndex',plugin:'roles',view:'index' }},
 				},function(result) {
 					var dataset = JSON.parse(result);
 					if(dataset.success != undefined){
-						for(const [key, value] of Object.entries(dataset.output.dom)){ API.Helper.set(API.Contents,['data','dom','roles',value.name],value); }
-						for(const [key, value] of Object.entries(dataset.output.raw)){ API.Helper.set(API.Contents,['data','raw','roles',value.name],value); }
-						API.Builder.table(card.children('.card-body'), dataset.output.dom, {
+						for(const [key, value] of Object.entries(dataset.output.dom)){ Engine.Helper.set(Engine.Contents,['data','dom','roles',value.name],value); }
+						for(const [key, value] of Object.entries(dataset.output.raw)){ Engine.Helper.set(Engine.Contents,['data','raw','roles',value.name],value); }
+						Engine.Builder.table(card.children('.card-body'), dataset.output.dom, {
 							headers:dataset.output.headers,
 							id:'RolesIndex',
 							modal:true,
@@ -31,20 +31,20 @@ API.Plugins.roles = {
 							clickable:{ enable:true, view:'details'},
 							controls:{ toolbar:true},
 						},function(response){
-							API.Plugins.roles.element.table.index = response.table;
+							Engine.Plugins.roles.element.table.index = response.table;
 						});
 					}
 				});
 			});
 		},
-		details:function(){ API.Plugins.roles.GUI.Tabs.init(); },
+		details:function(){ Engine.Plugins.roles.GUI.Tabs.init(); },
 	},
 	GUI:{
 		Tabs:{
 			init:function(){
 				const url = new URL(window.location.href);
 				var id = url.searchParams.get("id");
-				API.request('roles','fetch',{data:{id:id}},function(result){
+				Engine.request('roles','fetch',{data:{id:id}},function(result){
 					if(result.charAt(0) == '{'){
 						var dataset = JSON.parse(result);
 						var role = {
@@ -68,8 +68,8 @@ API.Plugins.roles = {
 							});
 						}
 						console.log(permissions);
-						API.Plugins.roles.GUI.Tabs.add('permissions',function(content, tab){
-							API.Builder.table(content, permissions, {
+						Engine.Plugins.roles.GUI.Tabs.add('permissions',function(content, tab){
+							Engine.Builder.table(content, permissions, {
 								id:'PermissionsIndex',
 								modal:true,
 								key:'name',
@@ -89,10 +89,10 @@ API.Plugins.roles = {
 									add:[
 										{
 											menu:'file',
-											text:'<i class="icon icon-permission mr-1"></i>'+API.Contents.Language['Add'],
+											text:'<i class="icon icon-permission mr-1"></i>'+Engine.Contents.Language['Add'],
 											name:'add',
 											action:function(){
-												API.Builder.modal($('body'), {
+												Engine.Builder.modal($('body'), {
 													title:'Add',
 													icon:'permission',
 													zindex:'top',
@@ -108,7 +108,7 @@ API.Plugins.roles = {
 													html += '<div class="row px-2">';
 														html += '<div class="col-12 p-2">';
 															html += '<div class="input-group">';
-																html += '<div class="input-group-prepend"><span class="input-group-text"><i class="icon icon-type mr-1"></i>'+API.Contents.Language['Type']+'</span></div>';
+																html += '<div class="input-group-prepend"><span class="input-group-text"><i class="icon icon-type mr-1"></i>'+Engine.Contents.Language['Type']+'</span></div>';
 																html += '<select data-key="type" title="type" class="form-control select2bs4 select2-hidden-accessible" name="type">';
 																	html += '<option></option>';
 																	html += '<option value="api">API</option>';
@@ -127,44 +127,44 @@ API.Plugins.roles = {
 														html += '</div>';
 														html += '<div class="col-12 p-2">';
 															html += '<div class="input-group">';
-																html += '<div class="input-group-prepend"><span class="input-group-text"><i class="icon icon-plugin mr-1"></i>'+API.Contents.Language['Plugin']+'</span></div>';
+																html += '<div class="input-group-prepend"><span class="input-group-text"><i class="icon icon-plugin mr-1"></i>'+Engine.Contents.Language['Plugin']+'</span></div>';
 																html += '<select data-key="plugin" title="plugin" class="form-control select2bs4 select2-hidden-accessible" name="plugin">';
-																for(const [key, value] of Object.entries(API.Contents.Plugins)){ if(value){ html += '<option value="'+key+'">'+API.Helper.ucfirst(API.Helper.clean(key))+'</option>'; } }
+																for(const [key, value] of Object.entries(Engine.Contents.Plugins)){ if(value){ html += '<option value="'+key+'">'+Engine.Helper.ucfirst(Engine.Helper.clean(key))+'</option>'; } }
 																html += '</select>';
 															html += '</div>';
 														html += '</div>';
 														html += '<div class="col-12 p-2">';
 															html += '<div class="input-group">';
-																html += '<div class="input-group-prepend"><span class="input-group-text"><i class="icon icon-table mr-1"></i>'+API.Contents.Language['Table']+'</span></div>';
+																html += '<div class="input-group-prepend"><span class="input-group-text"><i class="icon icon-table mr-1"></i>'+Engine.Contents.Language['Table']+'</span></div>';
 																html += '<select data-key="table" title="table" class="form-control select2bs4 select2-hidden-accessible" name="table">';
 																html += '<option value=""></option>';
-																for(const [key, value] of Object.entries(API.Contents.Tables)){ html += '<option value="'+value+'">'+API.Helper.ucfirst(value)+'</option>'; }
+																for(const [key, value] of Object.entries(Engine.Contents.Tables)){ html += '<option value="'+value+'">'+Engine.Helper.ucfirst(value)+'</option>'; }
 																html += '</select>';
 															html += '</div>';
 														html += '</div>';
 														html += '<div class="col-12 p-2">';
 															html += '<div class="input-group">';
-																html += '<div class="input-group-prepend"><span class="input-group-text"><i class="icon icon-field mr-1"></i>'+API.Contents.Language['Field']+'</span></div>';
+																html += '<div class="input-group-prepend"><span class="input-group-text"><i class="icon icon-field mr-1"></i>'+Engine.Contents.Language['Field']+'</span></div>';
 																html += '<select data-key="field" title="field" class="form-control select2bs4 select2-hidden-accessible" name="field">';
 																html += '</select>';
 															html += '</div>';
 														html += '</div>';
 														html += '<div class="col-12 p-2">';
 															html += '<div class="input-group">';
-																html += '<div class="input-group-prepend"><span class="input-group-text"><i class="icon icon-view mr-1"></i>'+API.Contents.Language['View']+'</span></div>';
+																html += '<div class="input-group-prepend"><span class="input-group-text"><i class="icon icon-view mr-1"></i>'+Engine.Contents.Language['View']+'</span></div>';
 																html += '<select data-key="view" title="view" class="form-control select2bs4 select2-hidden-accessible" name="view">';
 																html += '</select>';
 															html += '</div>';
 														html += '</div>';
 														html += '<div class="col-12 p-2">';
 															html += '<div class="input-group">';
-																html += '<div class="input-group-prepend"><span class="input-group-text"><i class="icon icon-name mr-1"></i>'+API.Contents.Language['Name']+'</span></div>';
-												      	html += '<input type="text" class="form-control" data-key="name" name="name" placeholder="'+API.Contents.Language['Name']+'" title="name">';
+																html += '<div class="input-group-prepend"><span class="input-group-text"><i class="icon icon-name mr-1"></i>'+Engine.Contents.Language['Name']+'</span></div>';
+												      	html += '<input type="text" class="form-control" data-key="name" name="name" placeholder="'+Engine.Contents.Language['Name']+'" title="name">';
 															html += '</div>';
 														html += '</div>';
 														html += '<div class="col-12 p-2">';
 															html += '<div class="input-group">';
-																html += '<div class="input-group-prepend"><span class="input-group-text"><i class="icon icon-level mr-1"></i>'+API.Contents.Language['Level']+'</span></div>';
+																html += '<div class="input-group-prepend"><span class="input-group-text"><i class="icon icon-level mr-1"></i>'+Engine.Contents.Language['Level']+'</span></div>';
 																html += '<select data-key="level" title="level" class="form-control select2bs4 select2-hidden-accessible" name="level">';
 																	html += '<option value="0">None</option>';
 																	html += '<option value="1">Read</option>';
@@ -204,7 +204,7 @@ API.Plugins.roles = {
 																	field.table.find('select').on('select2:select',function(table){
 																		if(table.currentTarget.value != ''){
 																			html = '';
-																			for(const [key, value] of Object.entries(API.Contents.Settings.Structure[table.currentTarget.value])){ html += '<option value="'+key+'">'+API.Helper.ucfirst(API.Helper.clean(key))+'</option>'; }
+																			for(const [key, value] of Object.entries(Engine.Contents.Settings.Structure[table.currentTarget.value])){ html += '<option value="'+key+'">'+Engine.Helper.ucfirst(Engine.Helper.clean(key))+'</option>'; }
 																			field.field.find('select').html(html);
 																			html = '';
 																			field.field.find('select').select2({ theme: 'bootstrap4' });
@@ -222,7 +222,7 @@ API.Plugins.roles = {
 																	field.plugin.find('select').on('select2:select',function(plugin){
 																		if(plugin.currentTarget.value != ''){
 																			html = '';
-																			for(const [key, value] of Object.entries(API.Contents.Views[plugin.currentTarget.value])){ html += '<option value="'+value+'">'+API.Helper.ucfirst(API.Helper.clean(value))+'</option>'; }
+																			for(const [key, value] of Object.entries(Engine.Contents.Views[plugin.currentTarget.value])){ html += '<option value="'+value+'">'+Engine.Helper.ucfirst(Engine.Helper.clean(value))+'</option>'; }
 																			field.view.find('select').html(html);
 																			html = '';
 																			field.view.find('select').select2({ theme: 'bootstrap4' });
@@ -287,11 +287,11 @@ API.Plugins.roles = {
 																values.name = field.view.find('select').select2('data')[0].id;
 																break;
 														}
-														API.request('permissions','create',{data:values,report:false},function(result){
+														Engine.request('permissions','create',{data:values,report:false},function(result){
 															var permission = JSON.parse(result);
 															if(permission.success != undefined){
-																API.Plugins.roles.element.table.permissions.DataTable().row.add(permission.output.dom).draw(false).node().id = permission.output.dom.id;
-																API.Plugins.roles.Event.Permissions();
+																Engine.Plugins.roles.element.table.permissions.DataTable().row.add(permission.output.dom).draw(false).node().id = permission.output.dom.id;
+																Engine.Plugins.roles.Event.Permissions();
 															}
 														});
 														modal.modal('hide');
@@ -303,11 +303,11 @@ API.Plugins.roles = {
 									],
 								},
 							},function(table){
-								API.Plugins.roles.element.table.permissions = table.table;
-								API.Plugins.roles.element.table.permissions.DataTable().on('draw.dt',function(){
-									API.Plugins.roles.Event.Permissions();
+								Engine.Plugins.roles.element.table.permissions = table.table;
+								Engine.Plugins.roles.element.table.permissions.DataTable().on('draw.dt',function(){
+									Engine.Plugins.roles.Event.Permissions();
 								});
-								API.Plugins.roles.Event.Permissions();
+								Engine.Plugins.roles.Event.Permissions();
 							});
 						});
 						var members = [];
@@ -315,8 +315,8 @@ API.Plugins.roles = {
 							if(typeof value.username !== "undefined"){ members.push({type:'user',name:value.username,id:value.id,key:key}); }
 							else { members.push({type:'group',name:value.name,id:value.id,key:key}); }
 						}
-						API.Plugins.roles.GUI.Tabs.add('members',function(content, tab){
-							API.Builder.table(content, members, {
+						Engine.Plugins.roles.GUI.Tabs.add('members',function(content, tab){
+							Engine.Builder.table(content, members, {
 								id:'MembersIndex',
 								modal:true,
 								key:'name',
@@ -332,8 +332,8 @@ API.Plugins.roles = {
 									label:false,
 									disable:['create','hide','filter','selectAll','selectNone','assign','unassign','delete','import'],
 									add:[
-										{menu:'file',name:'add',text:'<i class="icon icon-assign mr-1"></i>'+API.Contents.Language['Add'],action:function(){
-											API.Builder.modal($('body'), {
+										{menu:'file',name:'add',text:'<i class="icon icon-assign mr-1"></i>'+Engine.Contents.Language['Add'],action:function(){
+											Engine.Builder.modal($('body'), {
 												title:'Add',
 												icon:'assign',
 												zindex:'top',
@@ -355,8 +355,8 @@ API.Plugins.roles = {
 													html += '<div class="tab-pane" id="add_users_tab"></div>';
 												html += '</div>';
 												body.html(html);
-												API.Builder.input(body.find('#add_groups_tab'), 'group', null,function(input){});
-												API.Builder.input(body.find('#add_users_tab'), 'user', null,function(input){});
+												Engine.Builder.input(body.find('#add_groups_tab'), 'group', null,function(input){});
+												Engine.Builder.input(body.find('#add_users_tab'), 'user', null,function(input){});
 												footer.append('<a class="btn btn-success text-light"><i class="icon icon-assign mr-1"></i>Add</a>');
 												footer.find('a').click(function(){
 													var relationship = {
@@ -373,11 +373,11 @@ API.Plugins.roles = {
 															relationship.link_to_1 = body.find('select[data-key="user"]').select2('data')[0].id;
 															break;
 													}
-													API.request('relationships','create',{data:relationship},function(result){
+													Engine.request('relationships','create',{data:relationship},function(result){
 														var member = JSON.parse(result);
 														if(member.success != undefined){
-															API.Plugins.roles.element.table.members.DataTable().row.add({name:member.output.dom.link_to_1,type:member.output.dom.relationship_1,id:member.output.dom.id}).draw(false).node().id = member.output.dom.id;
-															API.Plugins.roles.Event.Members();
+															Engine.Plugins.roles.element.table.members.DataTable().row.add({name:member.output.dom.link_to_1,type:member.output.dom.relationship_1,id:member.output.dom.id}).draw(false).node().id = member.output.dom.id;
+															Engine.Plugins.roles.Event.Members();
 														}
 													});
 													modal.modal('hide');
@@ -388,11 +388,11 @@ API.Plugins.roles = {
 									],
 								},
 							},function(table){
-								API.Plugins.roles.element.table.members = table.table;
-								API.Plugins.roles.element.table.members.DataTable().on('draw.dt',function(){
-									API.Plugins.roles.Event.Members();
+								Engine.Plugins.roles.element.table.members = table.table;
+								Engine.Plugins.roles.element.table.members.DataTable().on('draw.dt',function(){
+									Engine.Plugins.roles.Event.Members();
 								});
-								API.Plugins.roles.Event.Members();
+								Engine.Plugins.roles.Event.Members();
 							});
 						});
 					}
@@ -402,7 +402,7 @@ API.Plugins.roles = {
 				if(options instanceof Function){ callback = options; options = {}; }
 				var tabs = $('#rolesTabs').find('.card-header').find('ul').first();
 				var contents = $('#rolesTabs').find('.card-body').find('div.tab-content').first();
-				tabs.append('<li class="nav-item"><a class="nav-link" data-toggle="pill" role="tab" id="rolesTabs-'+name.toLowerCase()+'" href="#rolesTabsContent-'+name.toLowerCase()+'" aria-controls="rolesTabsContent-'+name.toLowerCase()+'">'+API.Helper.ucfirst(name)+'</a></li>');
+				tabs.append('<li class="nav-item"><a class="nav-link" data-toggle="pill" role="tab" id="rolesTabs-'+name.toLowerCase()+'" href="#rolesTabsContent-'+name.toLowerCase()+'" aria-controls="rolesTabsContent-'+name.toLowerCase()+'">'+Engine.Helper.ucfirst(name)+'</a></li>');
 				tabs.find('a.nav-link').removeClass('active');
 				tabs.find('a.nav-link').first().addClass('active');
 				contents.append('<div class="tab-pane fade" id="rolesTabsContent-'+name.toLowerCase()+'" role="tabpanel" aria-labelledby="rolesTabs-'+name.toLowerCase()+'"></div>');
@@ -414,14 +414,14 @@ API.Plugins.roles = {
 	},
 	Event:{
 		Members:function(){
-			API.Plugins.roles.element.table.members.find('button').each(function(){
+			Engine.Plugins.roles.element.table.members.find('button').each(function(){
 				var control = $(this).attr('data-control');
-				var table = API.Plugins.roles.element.table.members;
+				var table = Engine.Plugins.roles.element.table.members;
 				var row = table.DataTable().row($(this).parents('tr'));
 				var rowdata = row.data();
 				$(this).off();
 				$(this).click(function(){
-					API.Builder.modal($('body'), {
+					Engine.Builder.modal($('body'), {
 						title:'Unlink',
 						icon:'unlink',
 						zindex:'top',
@@ -435,7 +435,7 @@ API.Plugins.roles = {
 						body.html('Are you sure you want to remove this member from the role?');
 						footer.append('<a class="btn btn-danger text-light"><i class="icon icon-unlink mr-1"></i>Remove</a>');
 						footer.find('a').click(function(){
-							API.request('relationships','delete',{data:rowdata},function(result){
+							Engine.request('relationships','delete',{data:rowdata},function(result){
 								var member = JSON.parse(result);
 								if(member.success != undefined){ table.DataTable().row($('#'+rowdata.id)).remove().draw(false); }
 							});
@@ -447,16 +447,16 @@ API.Plugins.roles = {
 			});
 		},
 		Permissions:function(){
-			API.Plugins.roles.element.table.permissions.find('button').each(function(){
+			Engine.Plugins.roles.element.table.permissions.find('button').each(function(){
 				var control = $(this).attr('data-control');
-				var table = API.Plugins.roles.element.table.permissions;
+				var table = Engine.Plugins.roles.element.table.permissions;
 				var row = table.DataTable().row($(this).parents('tr'));
 				var rowdata = row.data();
 				$(this).off();
 				switch(control){
 					case"Edit":
 						$(this).off().click(function(){
-							API.Builder.modal($('body'), {
+							Engine.Builder.modal($('body'), {
 								title:'Edit',
 								icon:'edit',
 								zindex:'top',
@@ -472,7 +472,7 @@ API.Plugins.roles = {
 								html += '<div class="row px-2">';
 									html += '<div class="col-12 p-2">';
 										html += '<div class="input-group">';
-											html += '<div class="input-group-prepend"><span class="input-group-text"><i class="icon icon-level mr-1"></i>'+API.Contents.Language['Level']+'</span></div>';
+											html += '<div class="input-group-prepend"><span class="input-group-text"><i class="icon icon-level mr-1"></i>'+Engine.Contents.Language['Level']+'</span></div>';
 											html += '<select data-key="level" title="level" class="form-control select2bs4 select2-hidden-accessible" name="level">';
 												html += '<option value="0">None</option>';
 												html += '<option value="1">Read</option>';
@@ -508,11 +508,11 @@ API.Plugins.roles = {
 									var values = rowdata;
 									values.level = body.find('select').select2('data')[0].id;
 									values.isLocked = lock.bootstrapSwitch('state');
-									API.request('permissions','update',{data:values,report:true},function(result){
+									Engine.request('permissions','update',{data:values,report:true},function(result){
 										var dataset = JSON.parse(result);
 										if(dataset.success != undefined){
 											row.data(dataset.output.dom).draw(false);
-											API.Plugins.roles.Event.Permissions();
+											Engine.Plugins.roles.Event.Permissions();
 										}
 									});
 									modal.modal('hide');
@@ -525,7 +525,7 @@ API.Plugins.roles = {
 						if((rowdata.isLocked == "true")||(rowdata.isLocked == true)){ $(this).remove(); }
 						else {
 							$(this).off().click(function(){
-								API.Builder.modal($('body'), {
+								Engine.Builder.modal($('body'), {
 									title:'Delete',
 									icon:'delete',
 									zindex:'top',
@@ -537,14 +537,14 @@ API.Plugins.roles = {
 									modal.find('.modal-header').find('.btn-group').find('[data-control="update"]').remove();
 									var body = modal.find('.modal-body');
 									var footer = modal.find('.modal-footer');
-									body.html(API.Contents.Language['Are you sure you want to remove this permission?']);
+									body.html(Engine.Contents.Language['Are you sure you want to remove this permission?']);
 									footer.append('<a class="btn btn-danger text-light"><i class="icon icon-delete mr-1"></i>Delete</a>');
 									footer.find('a').click(function(){
-										API.request('permissions','delete',{data:rowdata,report:false},function(result){
+										Engine.request('permissions','delete',{data:rowdata,report:false},function(result){
 											var dataset = JSON.parse(result);
 											if(dataset.success != undefined){
 												row.remove().draw(false);
-												API.Plugins.roles.Event.Permissions();
+												Engine.Plugins.roles.Event.Permissions();
 											}
 										});
 										modal.modal('hide');
@@ -560,4 +560,4 @@ API.Plugins.roles = {
 	},
 }
 
-API.Plugins.roles.init();
+Engine.Plugins.roles.init();
